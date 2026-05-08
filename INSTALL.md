@@ -35,12 +35,20 @@ Most direct. You pay Google directly; nothing routes through VicPropertyCheck.
 1. https://console.cloud.google.com/apis/credentials → create an API key.
 2. Enable the **Geocoding API** and **Places API (New)** for the project.
 3. Restrict the key to those two APIs.
-4. Export it:
+4. Make the key visible to the CLI. Two ways:
    ```bash
+   # Option 1 — env var (per-shell):
    export GOOGLE_MAPS_API_KEY=AIza...        # bash/zsh
    $env:GOOGLE_MAPS_API_KEY = "AIza..."      # pwsh
+
+   # Option 2 — persistent .env file (any shell, any directory):
+   # POSIX:    ~/.config/vicpropertycheck/.env
+   # Windows:  %APPDATA%\vicpropertycheck\.env
+   # File contents (one line):
+   #   VIC_PROPERTY_API__GOOGLE_MAPS_API_KEY=AIza...
    ```
-   The CLI also accepts `VIC_PROPERTY_API__GOOGLE_MAPS_API_KEY`.
+   Either form works. The .env file is preferred for `pipx`-installed CLIs
+   since it doesn't need the env var set in every new shell.
 
 ### Option B — sign in via VicPropertyCheck (hosted proxy)
 

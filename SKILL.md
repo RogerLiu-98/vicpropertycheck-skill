@@ -1,6 +1,6 @@
 ---
 name: vic-property-check
-version: 0.1.1
+version: 0.1.2
 description: |
   Look up Victorian (Australia) property data from authoritative sources: planning zones &
   overlays (VicMap), bushfire management overlays, suburb crime statistics, suburb housing
@@ -105,5 +105,20 @@ a single sub-call fails — those are non-fatal. Mention them only if directly r
 
 - Property valuations / sale price estimates — we don't have that data.
 - Anywhere outside Victoria — coordinates are bounds-checked to VIC. Tell the user.
-- Real-time data — the CLI caches responses (default ~7-90 days depending on source).
-  Treat figures as "current within a few weeks."
+- Real-time data. Two-stage lag stacks here:
+  1. **Source cadence.** The Crime Statistics Agency Victoria publishes quarterly,
+     with a 4-6 month lag from the period closing to the data going live. OpenStats
+     republishes on roughly the same cycle. VicMap planning + bushfire data updates
+     when the gazette does — slow, irregular, rarely within a single year.
+  2. **CLI cache.** On top of that, the CLI caches OpenStats responses for up to
+     90 days locally and VicMap responses for ~30 days. So a fresh CLI lookup may
+     itself be replaying a snapshot from weeks ago.
+
+  When the user asks about freshness or about a specific recent news event:
+  - Don't claim the data reflects events from the last few weeks. It almost
+    certainly doesn't.
+  - Name the upstream source by name (Crime Statistics Agency Victoria for crime,
+    OpenStats for housing, VicMap for planning/bushfire) so they know where to
+    look for live information.
+  - Point the user to crimestatistics.vic.gov.au or VicPol media releases for
+    operational reporting that hasn't yet been folded into the statistics.

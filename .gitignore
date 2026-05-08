@@ -2,3 +2,7 @@
 .vscode/
 .idea/
 *.swp
+
+# Dev-only eval harness (test prompts and assertions). Lives here while
+# iterating on the skill but isn't part of what end users install.
+evals/

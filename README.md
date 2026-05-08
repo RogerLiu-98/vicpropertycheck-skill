@@ -68,7 +68,6 @@ your own Google Maps API key or a free VicPropertyCheck account. See
 ## Links
 
 - CLI package on PyPI: https://pypi.org/project/vicpropertycheck/
-- CLI source: https://github.com/RogerLiu-98/vic-property-due-diligence-mcp
 - VicPropertyCheck web app: https://vicpropertycheck.com.au
 
 ## License

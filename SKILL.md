@@ -1,6 +1,6 @@
 ---
 name: vic-property-check
-version: 0.1.2
+version: 0.1.3
 description: |
   Look up Victorian (Australia) property data from authoritative sources: planning zones &
   overlays (VicMap), bushfire management overlays, suburb crime statistics, suburb housing
@@ -31,26 +31,41 @@ dump raw JSON unless they ask for it.
 
 ## Prerequisites (check once per session)
 
-Run this and confirm both:
+Run these two commands and read the output:
 
 ```bash
-command -v vic-property >/dev/null 2>&1 && echo "CLI OK" || echo "MISSING_CLI"
-[ -n "$GOOGLE_MAPS_API_KEY" ] && echo "KEY OK"
-[ -f ~/.config/vicpropertycheck/credentials.json ] && echo "PROXY_CREDS OK"
+vic-property --help >/dev/null 2>&1 && echo "CLI OK" || echo "MISSING_CLI"
+python -c "import os, json; from pathlib import Path; cfg = Path.home() / ('AppData/Roaming/vicpropertycheck' if os.name == 'nt' else '.config/vicpropertycheck'); env_files = [Path.cwd() / '.env', cfg / '.env']; key = os.environ.get('GOOGLE_MAPS_API_KEY') or os.environ.get('VIC_PROPERTY_API__GOOGLE_MAPS_API_KEY'); has_dotenv_key = any(f.exists() and 'GOOGLE_MAPS_API_KEY' in f.read_text() for f in env_files); has_creds = (cfg / 'credentials.json').exists(); print('KEY OK' if (key or has_dotenv_key) else ('PROXY_CREDS OK' if has_creds else 'NO_GOOGLE_AUTH'))"
 ```
 
+The Python one-liner is portable across bash, zsh, pwsh and cmd; the older
+bash-only `command -v` and `[ -f ... ]` probes only work on POSIX.
+
 - If `MISSING_CLI`: tell the user to run `pipx install vicpropertycheck` and stop. Do not
-  invent fallback data.
-- If `KEY OK` is printed: the CLI will call Google directly using the user's key.
-- Else if `PROXY_CREDS OK` is printed: the CLI will route Google calls through the
+  invent fallback data. If they don't have pipx, the prerequisite is
+  `python -m pip install --user pipx && python -m pipx ensurepath` (POSIX) or
+  `py -m pip install --user pipx && py -m pipx ensurepath` (Windows). After
+  install they may need a new shell for `vic-property` to be on PATH.
+- If `KEY OK`: the CLI will call Google directly. Either an env var is set
+  (`GOOGLE_MAPS_API_KEY` or the longer `VIC_PROPERTY_API__GOOGLE_MAPS_API_KEY`)
+  or a `.env` file with one of those names was found in CWD or in the user
+  config dir (`~/.config/vicpropertycheck/.env` POSIX,
+  `%APPDATA%\vicpropertycheck\.env` Windows). The CLI auto-loads either
+  location.
+- If `PROXY_CREDS OK`: the CLI will route Google calls through the
   VicPropertyCheck web app. No further setup needed — the user is logged in.
-- Else: tell the user they have two options:
-  1. **Self-hosted**: `export GOOGLE_MAPS_API_KEY=<their Google Maps key>`.
+- If `NO_GOOGLE_AUTH`: tell the user they have two options:
+  1. **Self-hosted**: set `GOOGLE_MAPS_API_KEY=<their key>` as an env var, OR
+     write a one-line `.env` with `VIC_PROPERTY_API__GOOGLE_MAPS_API_KEY=<key>`
+     in their user config dir (see paths above) for a persistent setup.
   2. **Hosted (no key needed)**: visit `https://vicpropertycheck.com.au/skill-auth`,
-     sign in, copy the JSON blob, then run `pbpaste | vic-property login` (or
-     `clip.exe | vic-property login` on Windows / paste manually).
-  Planning, bushfire, crime, and housing work without either path — they hit free
-  VIC government APIs. If the user only wants those, just continue.
+     sign in, copy the JSON blob, then run `vic-property login` and paste the
+     blob followed by Ctrl-D (POSIX) or Ctrl-Z+Enter (Windows). Or pipe via
+     `pbpaste | vic-property login` (macOS), `clip.exe | vic-property login`
+     (WSL), `Get-Clipboard | vic-property login` (PowerShell).
+
+  Planning, bushfire, crime, and housing work without either path — they hit
+  free VIC government APIs. If the user only wants those, just continue.
 
 ## Choosing a command
 

@@ -39,8 +39,8 @@ command -v vic-property >/dev/null 2>&1 && echo "CLI OK" || echo "MISSING_CLI"
 [ -f ~/.config/vicpropertycheck/credentials.json ] && echo "PROXY_CREDS OK"
 ```
 
-- If `MISSING_CLI`: tell the user `pipx install vicpropertycheck` (or `pip install -e <repo>`
-  during dev) and stop. Do not invent fallback data.
+- If `MISSING_CLI`: tell the user to run `pipx install vicpropertycheck` and stop. Do not
+  invent fallback data.
 - If `KEY OK` is printed: the CLI will call Google directly using the user's key.
 - Else if `PROXY_CREDS OK` is printed: the CLI will route Google calls through the
   VicPropertyCheck web app. No further setup needed — the user is logged in.

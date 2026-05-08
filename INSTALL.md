@@ -5,11 +5,11 @@ need to be on disk for it to work.
 
 ## 1. Install the CLI
 
-The CLI ships in the `vicpropertycheck` Python package (the same package that powers the
-MCP server — they share providers, cache, and config).
+The skill shells out to a `vic-property` CLI that ships in the `vicpropertycheck` Python
+package on PyPI.
 
 ```bash
-pipx install vicpropertycheck     # installs both `vic-property-mcp` (server) and `vic-property` (CLI)
+pipx install vicpropertycheck
 ```
 
 Verify:
@@ -18,10 +18,6 @@ vic-property --help
 ```
 Should print the subcommand list (`resolve-address`, `planning`, `bushfire`, `housing`,
 `crime`, `facilities`, `summarize`).
-
-> **Developing on the CLI?** The package source lives at
-> https://github.com/RogerLiu-98/vic-property-due-diligence-mcp. Clone it and run
-> `pipx install -e .` (or `pip install -e .` in a venv).
 
 ## 2. Choose how to call Google Maps
 
@@ -87,13 +83,7 @@ git clone https://github.com/RogerLiu-98/vicpropertycheck-skill "$env:USERPROFIL
 
 To update later, `cd` into that directory and run `git pull`.
 
-## 4. Local-dev variant
-
-If you're running the VicPropertyCheck web app locally (`npm run dev`), the auth page is
-at `http://localhost:3000/skill-auth`. The generated `proxyBaseUrl` will be
-`http://localhost:3000`, so the CLI talks to your local server — no production traffic.
-
-## 5. Verify end-to-end
+## 4. Verify end-to-end
 
 In a fresh Claude Code session, ask something like:
 
@@ -113,4 +103,4 @@ vic-property summarize --address "1 Spring St, Melbourne VIC 3000" --pretty
 | `command not found: vic-property` | CLI not installed, or pipx bin dir not on PATH (`pipx ensurepath`). |
 | `Configuration error: Google Maps API key is required` | Env var unset, or set in the wrong shell. |
 | `Address could not be geocoded` | The address resolved to nothing — usually a typo or a non-VIC address. |
-| Stale data | The CLI caches results in a SQLite file under your user data dir. Delete `vicpropertycheck/cache.db` to force a refresh. |
+| Stale data | The CLI caches results in a SQLite file. Delete `~/.local/share/vicpropertycheck/cache.db` (Linux/macOS) or `%LOCALAPPDATA%\vicpropertycheck\cache.db` (Windows) to force a refresh. |
